@@ -1,0 +1,22 @@
+table {
+    font-size: 15px;
+    background-color: #f1f2f6;
+    margin: auto;
+}
+
+th,
+td {
+    padding: 10px;
+}
+
+thead {
+    color: white;
+    background: rgba(0, 0, 0, 0.5);
+    cursor: pointer;
+}
+
+@media (max-width: 1240px) {
+    table {
+      font-size: 11px;
+    }
+  }
