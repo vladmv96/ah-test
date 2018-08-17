@@ -15,8 +15,18 @@ thead {
     cursor: pointer;
 }
 
+.arrow {
+    position: absolute;
+    height: 10px;
+    margin: 5px;
+}
+
 @media (max-width: 1240px) {
     table {
       font-size: 11px;
+    }
+
+    .arrow {
+        margin: 2px !important;
     }
   }

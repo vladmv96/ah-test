@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import Table from "./Table";
-import "../styles/App.css";
+import "./styles/App.css";
 import { Provider } from "react-redux";
 import setUpStore from "../store";
 
@@ -28,7 +28,7 @@ class App extends Component {
 
     return (
       <Provider store={this.state.store}>
-        <div className="App">
+        <div className="app">
           <Table />
         </div>
       </Provider>

@@ -1,94 +1,162 @@
 import React, { Component } from "react";
-import "../styles/Table.css";
+import tableData from "../data/profiles.json";
+import "./styles/Table.css";
 import { connect } from "react-redux";
-import { saveTable } from "../actions/table_actions";
+import {
+  saveSortValues,
+  saveArrowValues,
+  saveColumnIndex
+} from "../actions/table_actions";
+import arrow from "./icons/arrow.svg";
+import PropTypes from "prop-types";
 
 class Table extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      tableKeys: [],
-      sortValues: []
+      table: tableData,
+      tableKeys: []
     };
   }
 
-  componentWillMount = () => {
-    let tableKeys = Object.keys(this.props.table[0]);
+  counter = 1;
+
+  componentWillMount() {
+    const tableKeys = Object.keys(this.state.table[0]);
     this.createSortValues(tableKeys);
+    this.createArrowValues(tableKeys, this.props.columnIndex);
     this.setState({ tableKeys });
-  };
+  }
 
-  createSortValues = keys => {
-    for ( let i; i < keys.lenght; i++) {
-      this.state.sortValues.push(false);
+  createSortValues(keys) {
+    let sort = [...this.props.sortValues];
+    for (let i = 0; i < keys.length; i++) {
+      if (i !== this.props.columnIndex) {
+        sort[i] = false;
+      }
     }
-  };
+    this.props.saveSortValues(sort);
+  }
 
-  editSortValues = index => {
-    let newValue = !this.state.sortValues[index];
-    let newSortValues = this.state.sortValues;
+  createArrowValues(keys, index) {
+    let arrows = [];
+    for (let i = 0; i < keys.length; i++) {
+      if (i === index) {
+        arrows.push(true);
+      } else {
+        arrows.push(false);
+      }
+    }
+    this.props.saveArrowValues(arrows);
+  }
+
+  editSortDirection(index) {
+    let newValue = !this.props.sortValues[index];
+    let newSortValues = [...this.props.sortValues];
     newSortValues[index] = newValue;
-    this.setState({ sortValues: newSortValues });
-  };
+    this.props.saveSortValues(newSortValues);
+  }
 
   renderTableHeader = (item, index) => {
+    this.counter++;
     return (
-      <th key={index} onClick={this.sortTable.bind(this, index)}>
+      <th key={this.counter} onClick={this.sortTable.bind(this, index)}>
         {item}
+        {this.props.arrowValues[index] && (
+          <img
+            src={arrow}
+            alt="sort"
+            className="arrow"
+            style={
+              this.props.sortValues[index] ? arrowStyles.up : arrowStyles.down
+            }
+          />
+        )}
       </th>
     );
   };
 
-  renderTableBody = (list, index) => {
+  renderTableBody = list => {
+    this.counter++;
     return (
-      <tr key={index * 9}>
+      <tr key={this.counter}>
         {this.state.tableKeys.map(this.renderTableItem.bind(this, list))}
       </tr>
     );
   };
 
-  renderTableItem = (list, item, index) => {
-    return <td key={index * 17}> {list[item]} </td>;
+  renderTableItem(list, item) {
+    this.counter++;
+    return <td key={this.counter}> {list[item]} </td>;
+  }
+
+  componentDidMount() {
+    if (this.props.columnIndex !== -1) {
+      this.loadTable(this.props.columnIndex);
+    }
+  }
+
+  sortAction = (value,index) => {
+    const key = this.state.tableKeys[index];
+    let newTable;
+      newTable = [...this.state.table].sort(function(obj1, obj2) {
+        if (value ? obj1[key].toUpperCase() < obj2[key].toUpperCase() : obj1[key].toUpperCase() > obj2[key].toUpperCase()) return -1;
+        else return 1;
+      });
+    this.setState({ table: newTable });
+  };
+
+  loadTable = index => {
+    this.createArrowValues(this.state.tableKeys, index);
+    this.sortAction(this.props.sortValues[index], index);
   };
 
   sortTable = index => {
-    this.editSortValues(index);
-    let key = this.state.tableKeys[index];
-    let newTable;
-    if (this.state.sortValues[index]) {
-      newTable = this.props.table.slice().sort(function(obj1, obj2) {
-        if (obj1[key].toUpperCase() < obj2[key].toUpperCase()) return -1;
-        else return 1;
-      });
-    } else {
-      newTable = this.props.table.slice().sort(function(obj1, obj2) {
-        if (obj2[key].toUpperCase() < obj1[key].toUpperCase()) return -1;
-        else return 1;
-      });
-    }
-    this.props.saveTable(newTable);
+    this.props.saveColumnIndex(index);
+
+    this.editSortDirection(index);
+    this.createArrowValues(this.state.tableKeys, index);
+
+    this.sortAction(!this.props.sortValues[index], index);
   };
 
   render() {
     return (
-      <div className="Table">
+      <div className="table">
         <table>
           <thead>
             <tr>{this.state.tableKeys.map(this.renderTableHeader)}</tr>
           </thead>
-          <tbody>{this.props.table.map(this.renderTableBody)}</tbody>
+          <tbody>{this.state.table.map(this.renderTableBody)}</tbody>
         </table>
       </div>
     );
   }
 }
 
+const arrowStyles = {
+  up: {},
+  down: {
+    transform: "rotate(180deg)"
+  }
+};
+
+Table.propTypes = {
+  sortValues: PropTypes.array,
+  arrowValues: PropTypes.array,
+  columnIndex: PropTypes.number
+};
+
 const mapDispatchToProps = {
-  saveTable
+  saveSortValues,
+  saveArrowValues,
+  saveColumnIndex
 };
 
 const mapStateToProps = state => ({
-  table: state.table.table
+  sortValues: state.table.sortValues,
+  arrowValues: state.table.arrowValues,
+  columnIndex: state.table.columnIndex
 });
 
 export default connect(
