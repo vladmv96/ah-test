@@ -13,23 +13,26 @@ import PropTypes from "prop-types";
 class Table extends Component {
   constructor(props) {
     super(props);
+    const tableKeys = Object.keys(tableData && tableData[0]);
     this.state = {
       table: tableData,
-      tableKeys: []
+      tableKeys
     };
   }
 
   counter = 1;
 
-  componentWillMount() {
-    const tableKeys = Object.keys(this.state.table[0]);
+  componentDidMount() {
+    const { tableKeys } = this.state;
     this.createSortValues(tableKeys);
     this.createArrowValues(tableKeys, this.props.columnIndex);
-    this.setState({ tableKeys });
+      if (this.props.columnIndex !== -1) {
+          this.loadTable(this.props.columnIndex);
+      }
   }
 
   createSortValues(keys) {
-    let sort = [...this.props.sortValues];
+    const sort = [...this.props.sortValues];
     for (let i = 0; i < keys.length; i++) {
       if (i !== this.props.columnIndex) {
         sort[i] = false;
@@ -90,13 +93,7 @@ class Table extends Component {
     return <td key={this.counter}> {list[item]} </td>;
   }
 
-  componentDidMount() {
-    if (this.props.columnIndex !== -1) {
-      this.loadTable(this.props.columnIndex);
-    }
-  }
-
-  sortAction = (value,index) => {
+  sortAction (value,index) {
     const key = this.state.tableKeys[index];
     let newTable;
       newTable = [...this.state.table].sort(function(obj1, obj2) {
@@ -106,12 +103,12 @@ class Table extends Component {
     this.setState({ table: newTable });
   };
 
-  loadTable = index => {
+  loadTable (index) {
     this.createArrowValues(this.state.tableKeys, index);
     this.sortAction(this.props.sortValues[index], index);
   };
 
-  sortTable = index => {
+  sortTable(index) {
     this.props.saveColumnIndex(index);
 
     this.editSortDirection(index);
@@ -147,17 +144,17 @@ Table.propTypes = {
   columnIndex: PropTypes.number
 };
 
-const mapDispatchToProps = {
-  saveSortValues,
-  saveArrowValues,
-  saveColumnIndex
-};
-
 const mapStateToProps = state => ({
   sortValues: state.table.sortValues,
   arrowValues: state.table.arrowValues,
   columnIndex: state.table.columnIndex
 });
+
+const mapDispatchToProps = {
+  saveSortValues,
+  saveArrowValues,
+  saveColumnIndex
+};
 
 export default connect(
   mapStateToProps,
