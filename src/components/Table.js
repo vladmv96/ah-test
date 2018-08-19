@@ -24,17 +24,19 @@ class Table extends Component {
 
   componentDidMount() {
     const { tableKeys } = this.state;
+    const { columnIndex } = this.props;
     this.createSortValues(tableKeys);
-    this.createArrowValues(tableKeys, this.props.columnIndex);
-      if (this.props.columnIndex !== -1) {
-          this.loadTable(this.props.columnIndex);
-      }
+    this.createArrowValues(tableKeys, columnIndex);
+    if (this.props.columnIndex !== -1) {
+      this.loadTable(columnIndex);
+    }
   }
 
   createSortValues(keys) {
-    const sort = [...this.props.sortValues];
+    const { sortValues, columnIndex } = this.props;
+    let sort = [...sortValues];
     for (let i = 0; i < keys.length; i++) {
-      if (i !== this.props.columnIndex) {
+      if (i !== columnIndex) {
         sort[i] = false;
       }
     }
@@ -54,8 +56,9 @@ class Table extends Component {
   }
 
   editSortDirection(index) {
-    let newValue = !this.props.sortValues[index];
-    let newSortValues = [...this.props.sortValues];
+    const { sortValues } = this.props;
+    let newValue = !sortValues[index];
+    let newSortValues = [...sortValues];
     newSortValues[index] = newValue;
     this.props.saveSortValues(newSortValues);
   }
@@ -93,29 +96,33 @@ class Table extends Component {
     return <td key={this.counter}> {list[item]} </td>;
   }
 
-  sortAction (value,index) {
-    const key = this.state.tableKeys[index];
+  sortAction(value, index) {
+    const { tableKeys, table } = this.state;
+    const key = tableKeys[index];
     let newTable;
-      newTable = [...this.state.table].sort(function(obj1, obj2) {
-        if (value ? obj1[key].toUpperCase() < obj2[key].toUpperCase() : obj1[key].toUpperCase() > obj2[key].toUpperCase()) return -1;
-        else return 1;
-      });
+    newTable = [...table].sort(function(obj1, obj2) {
+      if (
+        value
+          ? obj1[key].toUpperCase() < obj2[key].toUpperCase()
+          : obj1[key].toUpperCase() > obj2[key].toUpperCase()
+      )
+        return -1;
+      else return 1;
+    });
     this.setState({ table: newTable });
-  };
+  }
 
-  loadTable (index) {
+  loadTable(index) {
     this.createArrowValues(this.state.tableKeys, index);
     this.sortAction(this.props.sortValues[index], index);
-  };
+  }
 
   sortTable(index) {
     this.props.saveColumnIndex(index);
-
     this.editSortDirection(index);
     this.createArrowValues(this.state.tableKeys, index);
-
     this.sortAction(!this.props.sortValues[index], index);
-  };
+  }
 
   render() {
     return (
