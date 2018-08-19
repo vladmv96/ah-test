@@ -34,7 +34,7 @@ class Table extends Component {
 
   createSortValues(keys) {
     const { sortValues, columnIndex } = this.props;
-    let sort = [...sortValues];
+    const sort = [...sortValues];
     for (let i = 0; i < keys.length; i++) {
       if (i !== columnIndex) {
         sort[i] = false;
@@ -44,7 +44,7 @@ class Table extends Component {
   }
 
   createArrowValues(keys, index) {
-    let arrows = [];
+    const arrows = [];
     for (let i = 0; i < keys.length; i++) {
       if (i === index) {
         arrows.push(true);
@@ -57,8 +57,8 @@ class Table extends Component {
 
   editSortDirection(index) {
     const { sortValues } = this.props;
-    let newValue = !sortValues[index];
-    let newSortValues = [...sortValues];
+    const newValue = !sortValues[index];
+    const newSortValues = [...sortValues];
     newSortValues[index] = newValue;
     this.props.saveSortValues(newSortValues);
   }
