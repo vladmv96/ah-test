@@ -32,7 +32,6 @@ class Table extends Component {
   }
 
   loadTable(index) {
-    this.props.createArrowValues();
     this.props.sortTable(this.props.sortValues[index]);
   }
 
