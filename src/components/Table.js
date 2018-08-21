@@ -14,7 +14,7 @@ class Table extends Component {
       this.props.createTable(tableData);
     }
   }
-
+  
   renderTableHeader = (item, index) => {
     this.counter++;
     return (
@@ -51,9 +51,7 @@ class Table extends Component {
 
   render() {
     if (!this.props.tableData.length) return null;
-
     const tableKeys = Object.keys(this.props.tableData[0]);
-
     return (
       <div className="table">
         <table>
