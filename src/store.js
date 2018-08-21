@@ -1,10 +1,9 @@
 import { createStore, applyMiddleware, compose, combineReducers } from "redux";
 import modules from "./reducers";
-import sortValuesMiddleware from './middlewares/sort_values_middleware';
-import arrowValuesMiddleware from './middlewares/arrow_values_middleware';
+import createTableMiddleware from './middlewares/create_table_middleware';
 import sortTableMiddleware from './middlewares/sort_table_middleware';
 
-const middlewares = [sortValuesMiddleware, arrowValuesMiddleware, sortTableMiddleware];
+const middlewares = [createTableMiddleware, sortTableMiddleware];
 
 const enhancers = [applyMiddleware(...middlewares)];
 

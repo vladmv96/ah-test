@@ -2,51 +2,23 @@ import React, { Component } from "react";
 import tableData from "../data/profiles.json";
 import "./styles/Table.css";
 import { connect } from "react-redux";
-import {
-  saveColumnIndex,
-  saveTableData,
-  createSortValues,
-  editSortDirection,
-  createArrowValues,
-  sortTable
-} from "../actions/table_actions";
+import { createTable, sortTable } from "../actions/table_actions";
 import arrow from "./icons/arrow.svg";
 import PropTypes from "prop-types";
 
 class Table extends Component {
-
   counter = 1;
-  tableKeys = Object.keys(tableData[0]);
 
   componentWillMount() {
-    this.props.saveTableData(tableData);
-  }
-
-  componentDidMount() {
-    const { columnIndex } = this.props;
-    this.props.createSortValues();
-    this.props.createArrowValues();
-    if (columnIndex !== -1) {
-      this.loadTable(columnIndex);
+    if (!this.props.tableData.length) {
+      this.props.createTable(tableData);
     }
   }
-
-  loadTable(index) {
-    this.props.sortTable(this.props.sortValues[index]);
-  }
-
-  sortTable(index) {
-    this.props.saveColumnIndex(index);
-    this.props.editSortDirection();
-    this.props.createArrowValues();
-    this.props.sortTable(!this.props.sortValues[index]);
-  }
-
 
   renderTableHeader = (item, index) => {
     this.counter++;
     return (
-      <th key={this.counter} onClick={this.sortTable.bind(this, index)}>
+      <th key={this.counter} onClick={this.props.sortTable.bind(this, index)}>
         {item}
         {this.props.arrowValues[index] && (
           <img
@@ -64,9 +36,10 @@ class Table extends Component {
 
   renderTableBody = list => {
     this.counter++;
+    const tableKeys = Object.keys(this.props.tableData[0]);
     return (
       <tr key={this.counter}>
-        {this.tableKeys.map(this.renderTableItem.bind(this, list))}
+        {tableKeys.map(this.renderTableItem.bind(this, list))}
       </tr>
     );
   };
@@ -77,11 +50,15 @@ class Table extends Component {
   }
 
   render() {
+    if (!this.props.tableData.length) return null;
+
+    const tableKeys = Object.keys(this.props.tableData[0]);
+
     return (
       <div className="table">
         <table>
           <thead>
-            <tr>{this.tableKeys.map(this.renderTableHeader)}</tr>
+            <tr>{tableKeys.map(this.renderTableHeader)}</tr>
           </thead>
           <tbody>{this.props.tableData.map(this.renderTableBody)}</tbody>
         </table>
@@ -112,11 +89,7 @@ const mapStateToProps = state => ({
 });
 
 const mapDispatchToProps = {
-  saveColumnIndex,
-  saveTableData,
-  createSortValues,
-  editSortDirection,
-  createArrowValues,
+  createTable,
   sortTable
 };
 

@@ -1,25 +1,43 @@
-const isValideAction = (action) => action.type === 'SORT_TABLE';
+const isValideAction = action => action.type === "SORT_TABLE";
 
 export default store => next => action => {
-    if ( isValideAction(action) ) {
-        const { table } = store.getState();
-        const value = action.data.value;
-        const index = table.columnIndex;
-        const key = Object.keys(table.tableData[0])[index];
-        let newTable;
+  const { table } = store.getState();
 
-        newTable = [...table.tableData].sort(function(obj1, obj2) {
-            if (
-              value
-                ? obj1[key].toUpperCase() < obj2[key].toUpperCase()
-                : obj1[key].toUpperCase() > obj2[key].toUpperCase()
-            )
-              return -1;
-            else return 1;
-          });
+  if (isValideAction(action)) {
+    const newArrowValues = [];
+    const keys = Object.keys(table.tableData[0]);
+    const index = action.columnIndex;
 
-          action.tableData = newTable;
+    for (let i = 0; i < keys.length; i++) {
+      if (i === index) {
+        newArrowValues.push(true);
+      } else {
+        newArrowValues.push(false);
+      }
     }
 
-    return next(action);
-}
+    const newValue = !table.sortValues[index];
+    const newSortValues = [...table.sortValues];
+    newSortValues[index] = newValue;
+
+    const value = !table.sortValues[index];
+    const key = keys[index];
+    let newTable;
+
+    newTable = [...table.tableData].sort(function(obj1, obj2) {
+      if (
+        value
+          ? obj1[key].toUpperCase() < obj2[key].toUpperCase()
+          : obj1[key].toUpperCase() > obj2[key].toUpperCase()
+      )
+        return -1;
+      else return 1;
+    });
+
+    action.arrowValues = newArrowValues;
+    action.tableData = newTable;
+    action.sortValues = newSortValues;
+  }
+
+  return next(action);
+};
