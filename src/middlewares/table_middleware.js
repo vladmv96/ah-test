@@ -1,15 +1,13 @@
-const isValideAction = action => action.type === "SORT_TABLE";
-
 export default store => next => action => {
   const { table } = store.getState();
-  if (isValideAction(action)) {
+  const newSortValues = [...table.sortValues];
+  if (action.type === "SORT_TABLE") {
+    const keys = Object.keys(table.tableData[0]);
     const newArrowValues = [],
-      index = action.columnIndex,
-      keys = Object.keys(table.tableData[0]);
+      index = action.columnIndex;
     for (let i = 0; i < keys.length; i++) {
-      i === index ? newArrowValues.push(true) : newArrowValues.push(false);
+      newArrowValues.push(i === index);
     }
-    const newSortValues = [...table.sortValues];
     newSortValues[index] = !table.sortValues[index];
     const key = keys[index];
     const newTable = [...table.tableData].sort(function(obj1, obj2) {
@@ -23,7 +21,12 @@ export default store => next => action => {
     });
     action.arrowValues = newArrowValues;
     action.tableData = newTable;
-    action.sortValues = newSortValues;
-  }
+  } else if (action.type === "CREATE_TABLE") {
+    const keys = Object.keys(action.tableData[0]);
+    for (let i = 0; i < keys.length; i++) {
+        newSortValues[i] = (i === table.columnIndex);
+    };
+  };
+  action.sortValues = newSortValues;
   return next(action);
 };
