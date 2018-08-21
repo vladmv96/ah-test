@@ -14,19 +14,19 @@ class Table extends Component {
       this.props.createTable(tableData);
     }
   }
-  
+
   renderTableHeader = (item, index) => {
     this.counter++;
     return (
       <th key={this.counter} onClick={this.props.sortTable.bind(this, index)}>
         {item}
-        {this.props.arrowValues[index] && (
+        {index === this.props.columnIndex && (
           <img
             src={arrow}
             alt="sort"
             className="arrow"
             style={
-              this.props.sortValues[index] ? arrowStyles.up : arrowStyles.down
+              this.props.sortValue ? arrowStyles.down : arrowStyles.up
             }
           />
         )}
@@ -73,15 +73,13 @@ const arrowStyles = {
 };
 
 Table.propTypes = {
-  sortValues: PropTypes.array,
-  arrowValues: PropTypes.array,
+  sortValue: PropTypes.bool,
   columnIndex: PropTypes.number,
   tableData: PropTypes.array
 };
 
 const mapStateToProps = state => ({
-  sortValues: state.table.sortValues,
-  arrowValues: state.table.arrowValues,
+  sortValue: state.table.sortValue,
   columnIndex: state.table.columnIndex,
   tableData: state.table.tableData
 });
